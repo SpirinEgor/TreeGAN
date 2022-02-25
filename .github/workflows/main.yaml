@@ -1,0 +1,30 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Lint with Black
+      run: |
+        pip install black
+        black . --check -l 120
+
+    - name: Check types with mypy
+      run: |
+        pip install mypy
+        if [ -d src ]; then mypy src --ignore-missing-imports; fi
+
+    - name: Run unit tests
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pytest
+        if [ -d tests ]; then pytest tests; fi
